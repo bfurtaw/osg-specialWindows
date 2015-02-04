@@ -1,0 +1,8 @@
+*~
+.svn
+.cproject
+.project
+*.bat
+*.txt
+*.swp
+
