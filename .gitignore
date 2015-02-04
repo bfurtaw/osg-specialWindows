@@ -4,5 +4,8 @@
 .project
 *.bat
 *.txt
+!CMakeLists.txt
 *.swp
+*.mm
+build/
 
