@@ -294,8 +294,8 @@ static  NvGLSLProgram*                m_shader = NULL;
 				  for (GLuint hh = 1; hh <= 240; ++hh) // W AR N I N G: hh <= 240 will not work for array maximum 256, OUT_OF_BOUNDS
 						if (glIsTexture(hh)) {
 							glBindTexture(GL_TEXTURE_2D, hh);
-							m_textureHandles[hh] = glGetTextureHandleARB(hh);
-							glMakeTextureHandleResidentARB(m_textureHandles[hh]);
+							m_textureHandles[hh-1] = glGetTextureHandleARB(hh-1);
+							glMakeTextureHandleResidentARB(m_textureHandles[hh-1]);
 							 m_numTextures++;
 							//OSG_WARN << "Count 'em " << m_numTextures << std::endl;
 						}
@@ -316,21 +316,21 @@ static  NvGLSLProgram*                m_shader = NULL;
 					GLuint samplersLocation(m_shader->getUniformLocation("samplers"));
 					glUniform1ui64vNV(samplersLocation, m_numTextures, m_textureHandles);
 					GLuint uniformLocation(m_shader->getUniformLocation("lightPos"));
-					glUniform3f(uniformLocation, 0.0, 0.0, 1.0);
+					glUniform3f(uniformLocation, 0.0, 1.0, 0.0);
 					OSG_WARN << "Locations (l/s)" << uniformLocation << " " << samplersLocation <<  std::endl;
 					
 				}
 				else {
 					GLuint uniformLocation(m_shader->getUniformLocation("lightPos"));
-					glUniform3f(uniformLocation, 0.0, 0.0, 1.0);
+					glUniform3f(uniformLocation, 0.0, 1.0, 0.0);
 					
 #if 0
 					GLint diffuseLocation(m_shader->getUniformLocation("diffuseMap"));
-					if (diffuseLocation > -1) glUniform1i(diffuseLocation, 0); // base Index TEXUNIT
+					if (diffuseLocation > -1) glUniform1i(diffuseLocation, 1); // base Index TEXUNIT
 					GLint bumpLocation = m_shader->getUniformLocation("bumpMap");
-					if (bumpLocation > -1) glUniform1i(bumpLocation, 6); // 6 Index TEXUNIT
+					if (bumpLocation > -1) glUniform1i(bumpLocation, 3); // 3 Index TEXUNIT
 					GLint specularLocation = m_shader->getUniformLocation("specularMap");
-					if(specularLocation > -1) glUniform1i(specularLocation, 0/*7*/); // 7 Index TEXUNIT
+					if(specularLocation > -1) glUniform1i(specularLocation, 2); // 2 Index TEXUNIT
 
 					
 					OSG_WARN << "Locations " << diffuseLocation << " " << bumpLocation << " " << specularLocation << std::endl;
@@ -341,11 +341,11 @@ static  NvGLSLProgram*                m_shader = NULL;
 		}
 #if 0
 		  GLint diffuseLocation(m_shader->getUniformLocation("diffuseMap"));
-		  if (diffuseLocation > -1) glUniform1i(diffuseLocation, 0); // base Index TEXUNIT
+		  if (diffuseLocation > -1) glUniform1i(diffuseLocation, 1); // base Index TEXUNIT
 		  GLint bumpLocation = m_shader->getUniformLocation("bumpMap");
-		  if (bumpLocation > -1) glUniform1i(bumpLocation, 6); // 6 Index TEXUNIT
+		  if (bumpLocation > -1) glUniform1i(bumpLocation, 3); // 3 Index TEXUNIT
 		  GLint specularLocation = m_shader->getUniformLocation("specularMap");
-		  if (specularLocation > -1) glUniform1i(specularLocation, 0/*7*/); // 7 Index TEXUNIT
+		  if (specularLocation > -1) glUniform1i(specularLocation, 2); // 2 Index TEXUNIT
 		  OSG_WARN << "Shader Prog " << prog << " Locations (d/b/s)" << diffuseLocation << " " << bumpLocation << " " << specularLocation << std::endl;
 #endif
 
