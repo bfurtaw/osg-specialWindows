@@ -164,15 +164,6 @@ void Texture2D::apply(State& state) const
     // get the contextID (user defined ID of 0 upwards) for the
     // current OpenGL context.
     const unsigned int contextID = state.getContextID();
-#if 0
-	 const GL2Extensions* extensions = GL2Extensions::Get(contextID, true);
-	 GLuint prog = 3;
-	 //glGetIntegerv(GL_CURRENT_PROGRAM, &prog);
-	 if(prog > 0) { // XXX blf: For now assume "xyz" is in the program.
-	 	GLuint xyzLocation(extensions->glGetUniformLocation(prog, "xyz"));
-	 	extensions->glUniform1i(xyzLocation, _uniqID);
-	 }
-#endif
 
     Texture::TextureObjectManager* tom = Texture::getTextureObjectManager(contextID).get();
     ElapsedTime elapsedTime(&(tom->getApplyTime()));

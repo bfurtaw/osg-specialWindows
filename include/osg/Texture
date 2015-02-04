@@ -441,7 +441,8 @@ class OSG_EXPORT Texture : public osg::StateAttribute
         virtual int getTextureHeight() const { return 0; }
         virtual int getTextureDepth() const { return 0; }
 
-		void UniqueID(GLint value) { _uniqID = value; }
+		  void UniqueID(GLint value) { _uniqID = value; }
+		  GLint getUniqueID() const { return _uniqID; }
 
         enum WrapParameter {
             WRAP_S,
@@ -619,13 +620,14 @@ class OSG_EXPORT Texture : public osg::StateAttribute
         inline InternalFormatType getInternalFormatType() const { return _internalFormatType; }
 
 		  enum TextureUsageType {
-		  		COLOR,
-				SPECULAR,
-				NORMAL,
-				LUMINOSITY
+		  		COLOR_TEXTURE,
+				SPECULAR_TEXTURE,
+				NORMAL_TEXTURE,
+				LUMINOSITY_TEXTURE
 			};
 
 			inline TextureUsageType getTextureUsageType() const { return _textureUsageType; }
+			inline void textureUsage(TextureUsageType tu) { _textureUsageType = tu; }
 
         class TextureObject;
 
@@ -1066,7 +1068,7 @@ class OSG_EXPORT Texture : public osg::StateAttribute
         float               _shadow_ambient;
 
         ImageAttachment _imageAttachment;
-		GLint					_uniqID;
+		  GLint					_uniqID;
 
     public:
 

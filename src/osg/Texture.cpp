@@ -81,7 +81,7 @@ Texture::TextureObject::~TextureObject()
 
 void Texture::TextureObject::bind()
 {
-	     static GLuint bumper = 6, specular=7;
+	     static GLuint bumper = 3, specular=0, luminosity=0;
         const unsigned int contextID = 0; // state.getContextID();  // set to 0 right now, assume same parameters for each graphics context...
         const Extensions* extensions = getExtensions(contextID,true);
 		  const GL2Extensions* EXTensions = GL2Extensions::Get(contextID, true);
@@ -93,36 +93,21 @@ void Texture::TextureObject::bind()
 		glGetIntegerv(GL_ACTIVE_TEXTURE, &active);
 		
 		if(prog > 0 && (active == GL_TEXTURE0) && (_id > 0)) {
-				OSG_WARN << _id << " is new base texture " <<  std::endl;
-				EXTensions->glVertexAttrib4f(5, _id, specular, bumper, 0);
+				//OSG_WARN << _id-1 << " is new base texture " <<  std::endl;
+				EXTensions->glVertexAttrib4f(5, _id-1, specular, bumper, luminosity);
 				//EXTensions->glVertexAttrib4f(5, 2, 2, 3, 0);
-				// XXX blf: This is a trick to only use the bump texture on one material.
-				//if (bumper > 0) bumper = 0;
+		}	
+		if(prog > 0 && (active == GL_TEXTURE2) && (_id > 0)) {
+				//OSG_WARN << _id-1 << " is new specular2 texture " <<  std::endl;
+				specular = _id-1;
 		}
-		if (prog > 0 && (active == GL_TEXTURE2) && (_id > 0)) {
-			OSG_WARN << _id << " is new bump2 texture " << std::endl;
-			//bumper = _id ;
+		if(prog > 0 && (active == GL_TEXTURE3) && (_id > 0)) {
+				//OSG_WARN << _id-1 << " is new bump3 texture " <<  std::endl;
+				bumper = _id-1;
 		}
-		if (prog > 0 && (active == GL_TEXTURE3) && (_id > 0)) {
-			OSG_WARN << _id << " is new bump3 texture " << std::endl;
-		}
-		if (prog > 0 && (active == GL_TEXTURE4) && (_id > 0)) {
-			OSG_WARN << _id << " is new bump4 texture " << std::endl;
-		}
-		if (prog > 0 && (active == GL_TEXTURE5) && (_id > 0)) {
-			OSG_WARN << _id << " is new bump5 texture " << std::endl;
-			
-		}
-		if(prog > 0 && (active == GL_TEXTURE6) && (_id > 0)) {
-				OSG_WARN << _id << " is new bump6 texture " <<  std::endl;
-				bumper = _id;
-		}
-		if(prog > 0 && (active == GL_TEXTURE7) && (_id > 0)) {
-				OSG_WARN << _id << " is new specular7 texture " <<  std::endl;
-				specular = _id ;
-		}
-		if (prog > 0 && (active == GL_TEXTURE8) && (_id > 0)) {
-			OSG_WARN << _id  << " is new bump8 texture " << std::endl;
+		if(prog > 0 && (active == GL_TEXTURE4) && (_id > 0)) {
+				//OSG_WARN << _id-1 << " is new luminosity4 texture " <<  std::endl;
+				luminosity = _id-1;
 		}
 
 	}
@@ -1216,6 +1201,7 @@ int Texture::compareTexture(const Texture& rhs) const
     COMPARE_StateAttribute_Parameter(_resizeNonPowerOfTwoHint)
 
     COMPARE_StateAttribute_Parameter(_internalFormatType);
+    COMPARE_StateAttribute_Parameter(_uniqID); // XXX blf: Added to keep textures for being ignored.
 
     return 0;
 }

@@ -1504,8 +1504,6 @@ void State::updateModelViewAndProjectionMatrixUniforms()
     if (_modelViewProjectionMatrixUniform.valid()) _modelViewProjectionMatrixUniform->set((*_modelView) * (*_projection));
 	 Matrixf MV(*_modelView);
 	 Matrixf P(*_projection);
-	 //extensions->glUseProgram(3);
-
 	 extensions->glUniformMatrix4fv(1, 1, GL_FALSE, MV.ptr());
 	 extensions->glUniformMatrix4fv(3, 1, GL_FALSE, P.ptr());
     if (_normalMatrixUniform.valid())
