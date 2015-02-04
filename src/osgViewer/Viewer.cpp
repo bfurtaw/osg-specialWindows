@@ -125,8 +125,11 @@ Viewer::Viewer(osg::ArgumentParser& arguments)
 
     int screenNum = -1;
     while (arguments.read("--screen",screenNum)) {}
-
-    int x = -1, y = -1, width = -1, height = -1;
+#ifdef WIN32
+    int x = 0, y = 0, width = 600, height = 340;  // XXX blf: Setup in window mode 16:9
+#else
+    int x = -1, y = -1, width = -1, height = -1; 
+#endif
     while (arguments.read("--window",x,y,width,height)) {}
 
     bool ss3d = false;
