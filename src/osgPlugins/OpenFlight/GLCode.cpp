@@ -290,11 +290,11 @@ static  NvGLSLProgram*                m_shader = NULL;
 			  if (glewIsExtensionSupported("GL_NV_bindless_texture")) {
 				  m_shader = NvGLSLProgram::createFromFiles("shaders/vert.glsl", "shaders/frag.glsl");
 				  m_textureHandles[0] = 0L; // Empty texture VOID(0)
-				  m_numTextures++;
+				  //m_numTextures++;
 				  for (GLuint hh = 1; hh <= 240; ++hh) // W AR N I N G: hh <= 240 will not work for array maximum 256, OUT_OF_BOUNDS
 						if (glIsTexture(hh)) {
 							glBindTexture(GL_TEXTURE_2D, hh);
-							m_textureHandles[hh-1] = glGetTextureHandleARB(hh-1);
+							m_textureHandles[hh-1] = glGetTextureHandleARB(hh);
 							glMakeTextureHandleResidentARB(m_textureHandles[hh-1]);
 							 m_numTextures++;
 							//OSG_WARN << "Count 'em " << m_numTextures << std::endl;

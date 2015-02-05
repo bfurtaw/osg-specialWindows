@@ -38,7 +38,6 @@ layout (location=0) out vec4 fragColor;
 //layout ( binding = 3 ) uniform sampler2D diffuseMap;
 
 uniform uint64_t samplers[256];
-uniform uint xyz;
 
 vec3 gammaCorrection( in vec3 color)
 {
@@ -57,13 +56,15 @@ void main()
 {
 	// Not USED with bumpmapping Phong lit ONLY    float NdotL = dot(norm, lightdir);
 	sampler2D diffuseMap = sampler2D(samplers[counts.x]);
-	float HdotL = pow( max( dot(norm,  lightdir), 0.0), 6.0);
-	vec3 diffuse = colorTexture(texture2D(diffuseMap, UVs).rgb); // White base color
+	vec4 diffuse = texture2D(diffuseMap, UVs); // White base color
 	sampler2D specularMap = sampler2D(samplers[counts.y]);
 	sampler2D bumpMap = sampler2D(samplers[counts.z]);
-	vec3 ambient = diffuse * vec3(.15, .15, .15);  // Dark grey ambient contrib
-	vec3 specular = texture2D(specularMap, UVs).rgb * HdotL; //* vec3(0.607843, 0.423529, 0.0823529); // Specular has a tint color
+	vec3 ambient = colorTexture(diffuse.rgb) * vec3(.15, .15, .15);  // Dark grey ambient contrib
+	vec3 specular = texture2D(specularMap, UVs).rgb; //* vec3(0.607843, 0.423529, 0.0823529); // Specular has a tint color
 	vec3 bump = texture2D(bumpMap, UVs).rgb * 2.0 - 1.0;
+	bump.g *= 2.5;
+	sampler2D lumMap = sampler2D(samplers[counts.w]);
+	vec3 lumin = texture2D(lumMap, UVs).rgb;
 
 	// Compute align TBN space along cameraspace norm(al), use displacements of texcoords0 and cameraspace position.
 	vec3 Q1 = dFdx(position);
@@ -75,13 +76,27 @@ void main()
 	vec3 B = normalize(-Q1*st2.s + Q2*st1.s);
 	//transpose of texture-to-eye space matrix
 	mat3 TBN = mat3(T, B, norm);
-	//bump = vec3(0.0, 1.0, 0.0); // Uncomment to see the normals on the model.
+
+	if(counts.z > 0)
+	   bump = normalize(bump); // Required step because green * 2.5 un-normalizes bumpvec
+	else  // Bumpdata is constant.
+		bump = vec3(0.0, 1.0, 0.0); // Uncomment to see the normals on the model.
 
 	vec3 bumpvec =  bump * TBN;
+	float HdotL = pow( max( dot(bumpvec,  lightdir), 0.0), 6.0);
 	float lambert = max(dot(lightdir, bumpvec), 0.0);
 
-	float alpha = 1.0;
+	float alpha = diffuse.a;
 
-	vec3 pcolor = ambient + 0.01 + diffuse * lambert ; //+ specular;
+	vec3 pcolor = ambient + 0.01 +  colorTexture(diffuse.rgb) * lambert ;
+
+	if(counts.y > 0)
+		pcolor += specular * HdotL;
+	else
+		pcolor += vec3(0.607843, 0.423529, 0.0823529) * HdotL;
+
+	if(position.x > 0.5 && counts.w > 0)
+		pcolor *= lumin;
+
 	fragColor = vec4(gammaCorrection(pcolor), alpha);
 }

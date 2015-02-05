@@ -89,7 +89,7 @@ void Texture::TextureObject::bind()
 #if 1
 { // XXX blf: grabbing program usage and setting base texture.
 	 	GLint prog, active;
-		glGetIntegerv(GL_CURRENT_PROGRAM, &prog);
+		//glGetIntegerv(GL_CURRENT_PROGRAM, &prog);
 		glGetIntegerv(GL_ACTIVE_TEXTURE, &active);
 		
 		if(prog > 0 && (active == GL_TEXTURE0) && (_id > 0)) {
