@@ -52,6 +52,14 @@ vec3 colorTexture( in vec3 color)
 	return pow(color, vec3(gammaValue) );
 }
 
+// Fresnel Effect to enhance specular
+float fresnel( in vec3 H, in vec3 view )
+{
+	float base = 1.0 + dot(view,H);
+	float exponential = pow(base, 5.0);
+	return max(0, min(1, .2 + 0.8 * exponential) );
+}	
+
 void main()
 {
 	// Not USED with bumpmapping Phong lit ONLY    float NdotL = dot(norm, lightdir);
@@ -60,7 +68,7 @@ void main()
 	sampler2D specularMap = sampler2D(samplers[counts.y]);
 	sampler2D bumpMap = sampler2D(samplers[counts.z]);
 	vec3 ambient = colorTexture(diffuse.rgb) * vec3(.15, .15, .15);  // Dark grey ambient contrib
-	vec3 specular = texture2D(specularMap, UVs).rgb; //* vec3(0.607843, 0.423529, 0.0823529); // Specular has a tint color
+	vec3 specular = gammaCorrection(texture2D(specularMap, UVs).rgb) * 0.5; //* vec3(0.607843, 0.423529, 0.0823529); // Specular has a tint color
 	vec3 bump = texture2D(bumpMap, UVs).rgb * 2.0 - 1.0;
 	bump.g *= 2.5;
 	sampler2D lumMap = sampler2D(samplers[counts.w]);
@@ -90,10 +98,12 @@ void main()
 
 	vec3 pcolor = ambient + 0.01 +  colorTexture(diffuse.rgb) * lambert ;
 
+        float R = fresnel(position, bumpvec); 
+
 	if(counts.y > 0)
-		pcolor += specular * HdotL;
+		pcolor += specular * HdotL * R ;
 	else
-		pcolor += vec3(0.607843, 0.423529, 0.0823529) * HdotL;
+		pcolor += vec3(0.607843, 0.423529, 0.0823529) * HdotL * R;
 
 	if(position.x > 0.5 && counts.w > 0)
 		pcolor *= lumin;
