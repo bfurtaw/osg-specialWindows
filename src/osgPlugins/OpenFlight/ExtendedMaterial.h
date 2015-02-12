@@ -105,15 +105,9 @@ public:
     				// Apply texture from texture pool.
     				osg::Texture* texture = dynamic_cast<osg::Texture*>(texturePoolStateset->getTextureAttribute(0,osg::StateAttribute::TEXTURE));
     				if (texture && (iter->layer >=0)) {
+						// Associate OSG Texture object with extended material
 					   OSG_WARN << " added Texture l[" << iter->layer << "] (" << /*iter->textureIndex*/texture->getUniqueID() << ")";
     					stateset->setTextureAttributeAndModes(iter->layer,texture,osg::StateAttribute::ON);
-    					/*XXX blf: For  multitexture only...
-						 * osg::TexEnv* texenv = new osg::TexEnv;
-    					if(texenv) {
-    						texenv->setMode(osg::TexEnv::ADD);
-    						stateset->setTextureAttributeAndModes(layer, texenv,osg::StateAttribute::ON);
-    					}
-						*/
     				}
     			}
     		}

@@ -183,6 +183,7 @@ class Multitexture : public Record
 
 
             uint32 mask = in.readUInt32();
+				//OSG_WARN << "Running Multitexture read record code, mask " << mask << std::endl;
             for (int layer=1; layer<8; layer++)
             {
                 uint32 layerBit = 0x80000000u >> (layer-1);
@@ -198,8 +199,10 @@ class Multitexture : public Record
                     {
                         // Apply texture from texture pool.
                         osg::Texture* texture = dynamic_cast<osg::Texture*>(texturePoolStateset->getTextureAttribute(0,osg::StateAttribute::TEXTURE));
-                        if (texture)
+                        if (texture) {
                             stateset->setTextureAttributeAndModes(layer,texture,osg::StateAttribute::ON);
+									 //OSG_WARN << "Multitexture: uniqueID " << texture->getUniqueID() << " effect " << effect << " layer " << layer << std::endl;
+								}
 
                         // Apply texture environment
                         switch (effect)

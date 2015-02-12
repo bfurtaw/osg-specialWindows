@@ -86,12 +86,11 @@ void Texture::TextureObject::bind()
         const Extensions* extensions = getExtensions(contextID,true);
 		  const GL2Extensions* EXTensions = GL2Extensions::Get(contextID, true);
     glBindTexture( _profile._target, _id);
-#if 1
+#if 0
 { // XXX blf: grabbing program usage and setting base texture.
 	 	GLint prog, active;
 		//glGetIntegerv(GL_CURRENT_PROGRAM, &prog);
 		glGetIntegerv(GL_ACTIVE_TEXTURE, &active);
-		
 		if(prog > 0 && (active == GL_TEXTURE0) && (_id > 0)) {
 				//OSG_WARN << _id-1 << " is new base texture " <<  std::endl;
 				EXTensions->glVertexAttrib4f(5, _id-1, specular, bumper, luminosity);
@@ -1133,7 +1132,8 @@ Texture::Texture():
             _use_shadow_comparison(false),
             _shadow_compare_func(LEQUAL),
             _shadow_texture_mode(LUMINANCE),
-            _shadow_ambient(0)
+            _shadow_ambient(0),
+				_textureUsageType(COLOR_TEXTURE)
 {
 }
 
@@ -1160,7 +1160,8 @@ Texture::Texture(const Texture& text,const CopyOp& copyop):
             _use_shadow_comparison(text._use_shadow_comparison),
             _shadow_compare_func(text._shadow_compare_func),
             _shadow_texture_mode(text._shadow_texture_mode),
-            _shadow_ambient(text._shadow_ambient)
+            _shadow_ambient(text._shadow_ambient),
+				_textureUsageType(text._textureUsageType)
 {
 }
 

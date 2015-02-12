@@ -455,35 +455,12 @@ protected:
         // Lighting
         stateset->setMode(GL_LIGHTING, isLit() ? osg::StateAttribute::ON : osg::StateAttribute::OFF);
         // Prefer Extended Materials  to osg::Material's
-        osg::StateSet *extendedMaterial;
-        osg::Program* program = new osg::Program; // Must decide if transparent or NOT and load correct shaders
+        osg::StateSet *extendedMaterial = NULL;
 
         if(materialIndex >= 0 && (extendedMaterial = document.getOrCreateExtendedMaterialPool()->get(materialIndex)) ) {
+		  		stateset->setAttributeAndModes(new ActiveUniforms(materialIndex, new osg::StateSet(*extendedMaterial) ), 
+						osg::StateAttribute::ON);
         	stateset->merge(*extendedMaterial);  // Will not OVERWRITE base texture.
-#if 0
-			if(materialIndex == 1) { // ematrl #1 reflective shiny
-             	 program->addShader(osg::Shader::readShaderFile(
-             	        osg::Shader::VERTEX,
-             	        osgDB::findDataFile("vert.glsl") ));
-              	 program->addShader(osg::Shader::readShaderFile(
-             	        osg::Shader::FRAGMENT,
-             	        osgDB::findDataFile("transparent.glsl") ));
-				  	 //program->addBindFragDataLocation("fragColor", 1);
-                //static osg::ref_ptr<osg::BlendFunc> blendFunc = new osg::BlendFunc(osg::BlendFunc::SRC_ALPHA, osg::BlendFunc::ONE_MINUS_SRC_ALPHA);
-                //stateset->setAttributeAndModes(blendFunc.get(), osg::StateAttribute::ON);
-                //stateset->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-			} else { // ematrl #0 bump mapped
-             	 program->addShader(osg::Shader::readShaderFile(
-             	        osg::Shader::VERTEX,
-             	        osgDB::findDataFile("vert.glsl") ));
-              	 program->addShader(osg::Shader::readShaderFile(
-             	        osg::Shader::FRAGMENT,
-             	        osgDB::findDataFile("frag.glsl") ));
-				  	 //program->addBindFragDataLocation("fragColor", 1);
-			}
-#endif
-         stateset->setAttributeAndModes(program, osg::StateAttribute::ON);
-        	//OSG_WARN << "Used ExtendedMaterial #" << materialIndex << " ematrl ptr " << extendedMaterial << std::endl;
         // Material
         } else 
 		  if (isLit() || materialIndex>=0)
@@ -527,9 +504,12 @@ protected:
          // Texture
         TexturePool* tp = document.getOrCreateTexturePool();
         osg::StateSet* textureStateSet = tp->get(textureIndex);
-        if (textureStateSet)
+        if (textureStateSet && !extendedMaterial)
         {
             // Merge face stateset with texture stateset
+		  		stateset->setAttributeAndModes(new ActiveUniforms(textureIndex+10000,
+					dynamic_cast<osg::Texture*>(textureStateSet->getTextureAttribute(0, osg::StateAttribute::TEXTURE))), 
+						osg::StateAttribute::ON);
             stateset->merge(*textureStateSet);
         }
 
@@ -567,8 +547,6 @@ protected:
         _geode->setStateSet(stateset.get());
 
 		  // RIGHT HERE load shaders and convert to glVertexAttributeArrays for VNT face primitives, ignore color for now.
-		  stateset->setAttributeAndModes(new ActiveUniforms(materialIndex), osg::StateAttribute::ON);
-		  stateset->addUniform(new osg::Uniform("lightPos", osg::Vec3(0.0, 0.0, 1.0)));
         // Add to parent.
         if (_parent.valid())
             _parent->addChild(*_geode);

@@ -9,11 +9,15 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 */
 
+#include <GL/glew.h>
 #include <osgDB/ReadFile>
 #include <osgUtil/Optimizer>
 #include <osg/CoordinateSystemNode>
 
 #include <osg/Switch>
+#include <osg/Texture>
+#include <osg/StateSet>
+#include <osg/Drawable>
 #include <osgText/Text>
 
 #include <osgViewer/Viewer>
@@ -68,22 +72,94 @@ public:
 		}
 };
 
-}
+} // end-o-namespace osgUtil
 
 class DisableDisplaylists : public osg::NodeVisitor 
 {
 public:
-	DisableDisplaylists() : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN) 
+					 DisableDisplaylists() : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN), statesets(0), geodes(0),
+					 lods(0), switches(0), transforms(0), groups(0), nodes(0)
 	{}
-	void apply(osg::Geode& geode)
-	{
-		for(unsigned int i=0; i < geode.getNumDrawables(); ++i)
-		{
-			osg::Geometry* geom = geode.getDrawable(i)->asGeometry();
-			geom->setUseDisplayList(false);
-			geom->setUseVertexBufferObjects(true);
-		}
-	}
+		  					{}
+		  		
+				    ~DisableDisplaylists() {
+					 		OSG_WARN << "LOD cnt " << lods << " stateset cnt " << statesets << " geode cnt " << geodes
+								<< " switch cnt " << switches << " transform cnt " << transforms << " group cnt " 
+								<< groups << " node cnt " << nodes << std::endl;
+						}
+					 void apply(osg::Geode& geode)
+					 {
+					 	++geodes;
+								for(unsigned int i=0; i < geode.getNumDrawables(); ++i)
+								{
+										  osg::Geometry* geom = geode.getDrawable(i)->asGeometry();
+										  geom->setUseDisplayList(false);
+										  geom->setUseVertexBufferObjects(true);
+
+										  showStateSet(geode.getDrawable(i)->getStateSet());
+								}
+					 }
+
+					 void apply(osg::Node& node) {
+					   ++nodes;
+					 	showStateSet(node.getStateSet());
+						traverse(node);
+					}
+
+					 void apply(osg::Group& node) {
+					   ++groups;
+					 	showStateSet(node.getStateSet());
+						traverse(node);
+					}
+
+					 void apply(osg::LOD& node) {
+					   ++lods;
+					 	showStateSet(node.getStateSet());
+						traverse(node);
+					}
+
+					 void apply(osg::Transform& node) {
+					   ++transforms;
+					 	showStateSet(node.getStateSet());
+						traverse(node);
+					}
+
+					 void apply(osg::Switch& node) {
+					   ++switches;
+					 	showStateSet(node.getStateSet());
+						traverse(node);
+					}
+
+
+		  protected:
+					 void showStateSet(osg::StateSet *state) {
+								if(state) {
+										  ++statesets;
+										  // loop through textures gather texture_handles
+										  unsigned int numTextures = state->getTextureAttributeList().size();
+										  unsigned int i = 0;
+										  for(i = 0; i<numTextures; ++i) {
+													 osg::StateAttribute* sa = state->getTextureAttribute(i,osg::StateAttribute::TEXTURE);
+													 osg::Texture* texture = dynamic_cast<osg::Texture*>(sa);
+													 OSG_WARN << "Texture uniqueID " << texture->getUniqueID() << std::endl;
+										  }
+										  osg::StateAttribute* sa = state->getAttribute(osg::StateAttribute::TEXTURE);
+										  if(sa)
+										     OSG_WARN << "Found a single texture" << std::endl;
+
+
+										  OSG_WARN << "Found StateSet has " << numTextures << " textures." << std::endl;
+								}
+					 }
+		private:
+			// Counters
+			int geodes;
+			int nodes;
+			int lods;
+			int transforms;
+			int switches;
+			int groups;
+			int statesets;
 };
 
 class MySwapBuffersCallback : public osg::GraphicsContext::SwapCallback
@@ -194,9 +270,46 @@ public:
     GLsync _previousSync;
 };
 
+// Time the draw and fill segements of the openGL Pipeline. Exclude the monitor sync.
+//
+class Profiler : public osg::GraphicsContext::SwapCallback
+{
+		  public:
+					 Profiler():  _timer1(0) { _query[0] = 0; };
+
+					 virtual void swapBuffersImplementation(osg::GraphicsContext* gc)
+					 {
+					         GLint done=0;
+					         // ...run through glClear(GL_COLOR_BUFFER_BIT | ...) and all the glDrawArrays() calls.
+					 			if(!_query[0]) {
+									glGenQueries(2, _query); // Create a query object..
+								   glQueryCounter(_query[0], GL_TIMESTAMP); // fake query to init.
+								}
+								glQueryCounter(_query[1], GL_TIMESTAMP);
+								// wait...unsynchronized call all fill operations complete
+								while (!done) {
+									glGetQueryObjectiv(_query[1], GL_QUERY_RESULT_AVAILABLE, &done);
+								}
+								glGetQueryObjectui64v(_query[0], GL_QUERY_RESULT, &_timer1);// get the results of the query.
+								glGetQueryObjectui64v(_query[1], GL_QUERY_RESULT, &_timer2);// get the results of the query.
+								OSG_WARN << "Frame render time " << (_timer2-_timer1) / 1.0e3 << " microseconds" << std::endl;
+
+								// glXSwapBuffers()
+								gc->swapBuffersImplementation();
+
+								glQueryCounter(_query[0], GL_TIMESTAMP);
+					 }
+		 private:
+			GLuint64 _timer1;
+			GLuint64 _timer2;
+			GLuint _query[2];
+
+};
+
 int main(int argc, char** argv)
 {
-    // use an ArgumentParser object to manage the program arguments.
+	 // use an ArgumentParser object to manage the program arguments.
+
     osg::ArgumentParser arguments(&argc,argv);
 
     arguments.getApplicationUsage()->setApplicationName(arguments.getApplicationName());
@@ -294,7 +407,9 @@ int main(int argc, char** argv)
     }
 
     bool doArbSync = arguments.read("--sync");
-	 bool doVBOs =  true; //arguments.read("--vbos");
+	 bool doVBOs =  arguments.read("--vbos");
+	 bool doPrints =  arguments.read("--printGraph");
+
 	 viewer.setThreadingModel(osgViewer::Viewer::SingleThreaded);
 	 viewer.getCamera()->setCullingMode(osg::Camera::NO_CULLING);
 
@@ -346,14 +461,20 @@ int main(int argc, char** argv)
     optimizer.optimize(loadedModel.get());
 
     viewer.setSceneData( loadedModel.get() );
-
+   if(doPrints) {
 	 osgUtil::PrintGeom printGraph(std::cout);
 	 loadedModel.get()->accept(printGraph);
+	}
 	if(doVBOs) {
 	 DisableDisplaylists disPlayed;
 	 loadedModel.get()->accept(disPlayed);
 	}
+
     viewer.realize();
+	 viewer.frame();
+
+	 glewExperimental = GL_TRUE;
+	 glewInit();
 
     // Check for multi-texture support on GPU
     for(unsigned int contextID = 0;
@@ -381,7 +502,16 @@ int main(int argc, char** argv)
         {
             (*itr)->setSwapCallback(new MySwapBuffersCallback);
         }
-    }
+    } else { // Profile DRAW_TIME
+        osgViewer::ViewerBase::Contexts contexts;
+        viewer.getContexts(contexts);
+        for(osgViewer::ViewerBase::Contexts::iterator itr = contexts.begin();
+            itr != contexts.end();
+            ++itr)
+        {
+            (*itr)->setSwapCallback(new Profiler);
+        }
+	 }
 
     return viewer.run();
 

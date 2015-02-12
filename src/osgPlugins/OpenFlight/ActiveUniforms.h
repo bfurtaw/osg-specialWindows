@@ -1,6 +1,7 @@
 #include <osg/StateAttribute>
 #include <osg/Object>
 #include <osg/State>
+#include <osg/Texture>
 #include "GLCode.h"
 
 namespace flt {
@@ -8,8 +9,10 @@ namespace flt {
 class ActiveUniforms : public osg::StateAttribute
 {
 	public:
-		ActiveUniforms() : _matrl_type(0) {}
-		ActiveUniforms(unsigned int matrl_type) : _matrl_type(matrl_type) {}
+		ActiveUniforms() : _matrl_type(0), _base_texture(NULL), _extended_matrl(NULL) {}
+		ActiveUniforms(unsigned int matrl_type) : _matrl_type(matrl_type), _base_texture(NULL), _extended_matrl(NULL) {}
+		ActiveUniforms(unsigned int matrl_type, osg::Texture *a_tex) : _matrl_type(matrl_type) , _base_texture(a_tex) {}
+		ActiveUniforms(unsigned int matrl_type, osg::StateSet *a_extend) : _matrl_type(matrl_type) , _base_texture(NULL), _extended_matrl(a_extend) {}
 		ActiveUniforms(const ActiveUniforms& act, const osg::CopyOp& copyop=osg::CopyOp::SHALLOW_COPY)
 		{}
 
@@ -30,8 +33,12 @@ class ActiveUniforms : public osg::StateAttribute
 		void apply(osg::State& state) const;
 
 	protected:
+	   GLuint getHandle(osg::StateSet *, GLuint, GLuint) const ;
 		~ActiveUniforms() {}
 		unsigned int _matrl_type;
+		osg::Texture *_base_texture;
+		osg::StateSet *_extended_matrl;
+
 };
 
 } // namespace flt
