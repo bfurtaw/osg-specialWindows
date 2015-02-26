@@ -18,6 +18,7 @@ SET(TARGET_SRC
     LightPointRecords.cpp
     LightSourcePaletteManager.cpp
     MaterialPaletteManager.cpp
+	 NoProgram.cpp
     PaletteRecords.cpp
     Pools.cpp
     PrimaryRecords.cpp
@@ -51,6 +52,8 @@ SET(TARGET_H
     Document.h
     LightSourcePaletteManager.h
     MaterialPaletteManager.h
+	 NoProgram.h
+	 NuGeometry.h
     Pools.h
     Record.h
     RecordInputStream.h

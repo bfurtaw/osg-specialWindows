@@ -326,7 +326,7 @@ protected:
         texture->setWrap(osg::Texture2D::WRAP_T,osg::Texture2D::REPEAT);
         texture->setResizeNonPowerOfTwoHint(true);
         texture->setImage(image.get());
-		  texture->UniqueID(index);	// XXX blf: set the Creator ID here so TextureUsageType match can be found later.
+		  //texture->UniqueID(index);	// XXX blf: set the Creator ID here so TextureUsageType match can be found later.
         stateset->setTextureAttributeAndModes(0, texture, osg::StateAttribute::ON);
 
         // Read attribute file

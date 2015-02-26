@@ -39,6 +39,8 @@
 #include "Document.h"
 #include "RecordInputStream.h"
 
+#include "NoProgram.h"
+
 namespace flt {
 
 /** Header
@@ -126,6 +128,8 @@ protected:
 
         _header = new osg::Group;
         _header->setName(id);
+
+		   _header->getOrCreateStateSet()->setAttributeAndModes(new NoProgram(), osg::StateAttribute::ON);
 
         // Store model origin in returned Node userData.
         osgSim::GeographicLocation* loc = new osgSim::GeographicLocation;

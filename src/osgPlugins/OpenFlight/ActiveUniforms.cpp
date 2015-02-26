@@ -30,7 +30,7 @@ void ActiveUniforms::apply(osg::State& state) const
 		  //use glVertexAttrib4f to set the state properly.      EXTensions->glVertexAttrib4f(5, _id-1, specular, bumper, luminosity);
 		  // make sure Attrib number 5 is enabled.
 		  if(_base_texture) {
-					 OSG_WARN << "Base Texture ID " << _base_texture->getUniqueID() << std::endl;
+					 //OSG_WARN << "Base Texture ID " << _base_texture->getUniqueID() << std::endl;
 					 osg::Texture::TextureObject *texobj = _base_texture->getTextureObject(contextID);
 					 if(texobj) {
 								OSG_WARN << "Base Texture Handle " << texobj->id() << std::endl;

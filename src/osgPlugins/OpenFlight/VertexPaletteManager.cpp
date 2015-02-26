@@ -22,6 +22,8 @@
 #include <osg/Geometry>
 #include <map>
 
+#include "NuGeometry.h"
+
 
 namespace flt
 {
@@ -53,7 +55,7 @@ VertexPaletteManager::~VertexPaletteManager()
 }
 
 void
-VertexPaletteManager::add( const osg::Geometry& geom )
+VertexPaletteManager::add( const osg::NuGeometry& geom )
 {
     const osg::Array* v = geom.getVertexArray();
     if (!v)

@@ -35,6 +35,8 @@
 #include <osg/GLExtensions>
 #include <osg/ValueObject>
 
+#include "NuGeometry.h"
+
 #include <algorithm>
 
 namespace flt {
@@ -70,14 +72,14 @@ void reverseWindingOrder( ARRAY* data, GLenum mode, GLint first, GLint last )
 void addDrawableAndReverseWindingOrder( osg::Geode* geode )
 {
     // Replace double sided polygons by duplicating the drawables and inverting the normals.
-    std::vector<osg::Geometry*> new_drawables;
+    std::vector<osg::NuGeometry*> new_drawables;
 
     for (size_t i=0; i<geode->getNumDrawables(); ++i)
     {
-        const osg::Geometry* geometry = dynamic_cast<const osg::Geometry*>(geode->getDrawable(i));
+        const osg::NuGeometry* geometry = dynamic_cast<const osg::NuGeometry*>(geode->getDrawable(i));
         if(geometry)
         {
-            osg::Geometry* geom = new osg::Geometry(*geometry
+            osg::NuGeometry* geom = new osg::NuGeometry(*geometry
                 , osg::CopyOp::DEEP_COPY_ARRAYS | osg::CopyOp::DEEP_COPY_PRIMITIVES);
             new_drawables.push_back(geom);
 
@@ -160,7 +162,7 @@ class Face : public PrimaryRecord
     uint8       _lightMode;
 
     osg::ref_ptr<osg::Geode> _geode;
-    osg::ref_ptr<osg::Geometry> _geometry;
+    osg::ref_ptr<osg::NuGeometry> _geometry;
 
 public:
 
@@ -420,7 +422,7 @@ protected:
         _geode->setDataVariance(osg::Object::STATIC);
         _geode->setName(id);
 
-        _geometry = new osg::Geometry;
+        _geometry = new osg::NuGeometry;
         _geometry->setDataVariance(osg::Object::STATIC);
         _geode->addDrawable(_geometry.get());
 
@@ -592,7 +594,7 @@ protected:
             // Add primitives, set bindings etc.
             for (unsigned int i=0; i<_geode->getNumDrawables(); ++i)
             {
-                osg::Geometry* geometry = dynamic_cast<osg::Geometry*>(_geode->getDrawable(i));
+                osg::NuGeometry* geometry = dynamic_cast<osg::NuGeometry*>(_geode->getDrawable(i));
                 if (geometry)
                 {
                     osg::Array* vertices = geometry->getVertexArray();
@@ -956,7 +958,7 @@ public:
             _parent->addChild(child);
     }
 
-    virtual void addGeometry(osg::Geometry& geometry)
+    virtual void addGeometry(osg::NuGeometry& geometry)
     {
         _geode->addDrawable(&geometry);
     }
@@ -1389,7 +1391,7 @@ protected:
             break;
         }
 
-        osg::ref_ptr<osg::Geometry> geometry = new osg::Geometry;
+        osg::ref_ptr<osg::NuGeometry> geometry = new osg::NuGeometry;
         geometry->addPrimitiveSet(new osg::DrawArrays(mode,0,vertexCount));
 
         for (unsigned int n=0; n<vertexCount; n++)

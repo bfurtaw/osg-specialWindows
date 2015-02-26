@@ -54,7 +54,7 @@ State::State():
     _modelView = _identity;
     _modelViewCache = new osg::RefMatrix;
 
-    #if 1 // XXX blf: commented... !defined(OSG_GL_FIXED_FUNCTION_AVAILABLE)
+    #if !defined(OSG_GL_FIXED_FUNCTION_AVAILABLE)
         _useModelViewAndProjectionUniforms = true;
         _useVertexAttributeAliasing = true;
     #else
@@ -1060,7 +1060,7 @@ void State::setVertexAttribPointer( unsigned int index,
 {
     if (_glVertexAttribPointer)
     {
-         //OSG_WARN<<"State::setVertexAttribPointer("<<index<<",...)"<<std::endl;
+        // OSG_NOTICE<<"State::setVertexAttribPointer("<<index<<",...)"<<std::endl;
 
 	     if ( index >= _glMaxVertexAttribs ) return; //abort(); // XXX blf: glGetIntegerv(GL_MAX_VERTEX_ATTRIBS);
         if ( index >= _vertexAttribArrayList.size()) _vertexAttribArrayList.resize(index+1);
@@ -1069,12 +1069,12 @@ void State::setVertexAttribPointer( unsigned int index,
         if (!eap._enabled || eap._dirty)
         {
             eap._enabled = true;
-             //OSG_WARN<<"    _glEnableVertexAttribArray( "<<index<<" )"<<std::endl;
+            // OSG_NOTICE<<"    _glEnableVertexAttribArray( "<<index<<" )"<<std::endl;
             _glEnableVertexAttribArray( index );
         }
         //if (eap._pointer != ptr || eap._normalized!=normalized || eap._dirty)
         {
-             //OSG_WARN<<"    _glVertexAttribPointer( "<<index<<" )"<<std::endl;
+            // OSG_NOTICE<<"    _glVertexAttribPointer( "<<index<<" )"<<std::endl;
             _glVertexAttribPointer( index, size, type, normalized, stride, ptr );
             eap._pointer = ptr;
             eap._normalized = normalized;
@@ -1324,10 +1324,10 @@ bool State::checkGLErrors(const StateAttribute* attribute) const
     return false;
 }
 
+
 void State::applyModelViewAndProjectionUniformsIfRequired()
 {
-
-	if (!_lastAppliedProgramObject) return;
+    if (!_lastAppliedProgramObject) return;
 
     if (_modelViewMatrixUniform.valid()) _lastAppliedProgramObject->apply(*_modelViewMatrixUniform);
     if (_projectionMatrixUniform) _lastAppliedProgramObject->apply(*_projectionMatrixUniform);
@@ -1496,16 +1496,10 @@ void State::applyModelViewMatrix(const osg::Matrix& matrix)
 }
 
 #include <osg/io_utils>
-#include <osg/GL2Extensions>
 
 void State::updateModelViewAndProjectionMatrixUniforms()
 {
-	 const GL2Extensions* extensions = GL2Extensions::Get(getContextID(), true);
     if (_modelViewProjectionMatrixUniform.valid()) _modelViewProjectionMatrixUniform->set((*_modelView) * (*_projection));
-	 Matrixf MV(*_modelView);
-	 Matrixf P(*_projection);
-	 extensions->glUniformMatrix4fv(1, 1, GL_FALSE, MV.ptr());
-	 extensions->glUniformMatrix4fv(3, 1, GL_FALSE, P.ptr());
     if (_normalMatrixUniform.valid())
     {
         Matrix mv(*_modelView);
@@ -1519,7 +1513,6 @@ void State::updateModelViewAndProjectionMatrixUniforms()
                              matrix(0,2), matrix(1,2), matrix(2,2));
 
         _normalMatrixUniform->set(normalMatrix);
-	 	  extensions->glUniformMatrix3fv(2, 1, GL_FALSE, normalMatrix.ptr());
     }
 }
 

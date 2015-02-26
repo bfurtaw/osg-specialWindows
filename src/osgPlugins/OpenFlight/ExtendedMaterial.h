@@ -106,7 +106,7 @@ public:
     				osg::Texture* texture = dynamic_cast<osg::Texture*>(texturePoolStateset->getTextureAttribute(0,osg::StateAttribute::TEXTURE));
     				if (texture && (iter->layer >=0)) {
 						// Associate OSG Texture object with extended material
-					   OSG_WARN << " added Texture l[" << iter->layer << "] (" << /*iter->textureIndex*/texture->getUniqueID() << ")";
+					   //OSG_WARN << " added Texture l[" << iter->layer << "] (" << /*iter->textureIndex*/texture->getUniqueID() << ")";
     					stateset->setTextureAttributeAndModes(iter->layer,texture,osg::StateAttribute::ON);
     				}
     			}

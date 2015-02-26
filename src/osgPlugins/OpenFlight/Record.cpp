@@ -22,6 +22,7 @@
 #include <osg/MatrixTransform>
 #include "Record.h"
 #include "Document.h"
+#include "NuGeometry.h"
 
 using namespace flt;
 
@@ -121,7 +122,7 @@ void flt::insertMatrixTransform(osg::Node& node, const osg::Matrix& matrix, int 
 ///////////////////////////////////////////////////////////////////////////////////
 
 
-osg::Vec3Array* flt::getOrCreateVertexArray(osg::Geometry& geometry)
+osg::Vec3Array* flt::getOrCreateVertexArray(osg::NuGeometry& geometry)
 {
     osg::Vec3Array* vertices = dynamic_cast<osg::Vec3Array*>(geometry.getVertexArray());
     if (!vertices)
@@ -132,7 +133,7 @@ osg::Vec3Array* flt::getOrCreateVertexArray(osg::Geometry& geometry)
     return vertices;
 }
 
-osg::Vec3Array* flt::getOrCreateNormalArray(osg::Geometry& geometry)
+osg::Vec3Array* flt::getOrCreateNormalArray(osg::NuGeometry& geometry)
 {
     osg::Vec3Array* normals = dynamic_cast<osg::Vec3Array*>(geometry.getNormalArray());
     if (!normals)
@@ -143,7 +144,7 @@ osg::Vec3Array* flt::getOrCreateNormalArray(osg::Geometry& geometry)
     return normals;
 }
 
-osg::Vec4Array* flt::getOrCreateColorArray(osg::Geometry& geometry)
+osg::Vec4Array* flt::getOrCreateColorArray(osg::NuGeometry& geometry)
 {
     osg::Vec4Array* colors = dynamic_cast<osg::Vec4Array*>(geometry.getColorArray());
     if (!colors)
@@ -155,7 +156,7 @@ osg::Vec4Array* flt::getOrCreateColorArray(osg::Geometry& geometry)
 }
 
 
-osg::Vec2Array* flt::getOrCreateTextureArray(osg::Geometry& geometry, int unit)
+osg::Vec2Array* flt::getOrCreateTextureArray(osg::NuGeometry& geometry, int unit)
 {
     osg::Vec2Array* UVs = dynamic_cast<osg::Vec2Array*>(geometry.getTexCoordArray(unit));
     if (!UVs)

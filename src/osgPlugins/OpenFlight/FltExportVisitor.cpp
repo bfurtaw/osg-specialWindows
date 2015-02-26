@@ -50,6 +50,8 @@
 #include <osgSim/LightPointNode>
 #include <osgSim/ObjectRecordData>
 
+#include "NuGeometry.h"
+
 #ifdef _MSC_VER
 // Disable this warning. It's OK for us to use 'this' in initializer list,
 // as the texturePaletteManager merely stores a ref to it.
@@ -370,7 +372,7 @@ FltExportVisitor::apply( osg::Geode& node )
         {
             // If at least one record will be a Face record, then we
             //   need to write to the vertex palette.
-            _vertexPalette->add( *geom );
+            _vertexPalette->add( *( new const osg::NuGeometry(*geom)) ); // XXX blf: do I need a ref_ptr HERE.
 
             // Iterate over all PrimitiveSets and output Face records.
             unsigned int jdx;

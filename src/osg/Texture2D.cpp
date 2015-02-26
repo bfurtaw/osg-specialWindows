@@ -195,6 +195,7 @@ void Texture2D::apply(State& state) const
     if (textureObject)
     {
         textureObject->bind();
+	     //OSG_WARN << "5 Creating texture (" << _uniqID << ") Handle " << textureObject->id() << std::endl;
 
         if (getTextureParameterDirty(state.getContextID()))
             applyTexParameters(GL_TEXTURE_2D,state);
@@ -221,6 +222,7 @@ void Texture2D::apply(State& state) const
     else if (_subloadCallback.valid())
     {
         _textureObjectBuffer[contextID] = textureObject = _subloadCallback->generateTextureObject(*this, state);
+	     //OSG_WARN << "2 Creating texture (" << _uniqID << ") Handle " << textureObject->id() << std::endl;
 
         textureObject->bind();
 
@@ -253,6 +255,7 @@ void Texture2D::apply(State& state) const
 
         _textureObjectBuffer[contextID] = textureObject = generateTextureObject(
                 this, contextID,GL_TEXTURE_2D,_numMipmapLevels,_internalFormat,_textureWidth,_textureHeight,1,_borderWidth);
+	     //OSG_WARN << "3 Creating texture (" << _uniqID << ") Handle " << textureObject->id() << std::endl;
 
         textureObject->bind();
 
@@ -294,6 +297,7 @@ void Texture2D::apply(State& state) const
     {
         _textureObjectBuffer[contextID] = textureObject = generateTextureObject(
                 this, contextID,GL_TEXTURE_2D,_numMipmapLevels,_internalFormat,_textureWidth,_textureHeight,1,_borderWidth);
+	     //OSG_WARN << "Creating texture (" << _uniqID << ") Handle " << textureObject->id() << std::endl;
 
         textureObject->bind();
 
@@ -391,6 +395,7 @@ void Texture2D::copyTexImage2D(State& state, int x, int y, int width, int height
     }
 
     _textureObjectBuffer[contextID] = textureObject = generateTextureObject(this, contextID,GL_TEXTURE_2D,_numMipmapLevels,_internalFormat,_textureWidth,_textureHeight,1,0);
+	     //OSG_WARN << "1 Creating texture (" << _uniqID << ") Handle " << textureObject->id() << std::endl;
 
     textureObject->bind();
 
@@ -464,6 +469,7 @@ void Texture2D::allocateMipmap(State& state) const
     // get the texture object for the current contextID.
     TextureObject* textureObject = getTextureObject(contextID);
 
+	     //OSG_WARN << "4 Creating texture (" << _uniqID << ") Handle " << textureObject->id() << std::endl;
     if (textureObject && _textureWidth != 0 && _textureHeight != 0)
     {
         // bind texture

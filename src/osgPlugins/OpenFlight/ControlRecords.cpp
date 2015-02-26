@@ -47,8 +47,8 @@ class PushLevel : public Record
             	// Callback to extended material instances to define StateSets
             	// All materials extended or otherwise and textures have to be defined by 1st PushRecord.
             	if(extended) {
-            		extended->applyMerge(document);
             	    //OSG_WARN << "Extended Material Storage " << extended << " should NOT be zero" << std::endl;
+            		extended->applyMerge(document);
             	    extended->destroy(); // Free the memory from the heap.
             	}
             }

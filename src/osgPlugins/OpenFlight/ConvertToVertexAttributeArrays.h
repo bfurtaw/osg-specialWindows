@@ -33,6 +33,8 @@
 #include <osgDB/ReadFile>
 #include <osgDB/WriteFile>
 
+#include "NuGeometry.h"
+
 namespace flt {
 
 class ConvertToVertexAttributeArrays : public osg::NodeVisitor
@@ -124,7 +126,7 @@ class ConvertToVertexAttributeArrays : public osg::NodeVisitor
             {
                 if (geode.getDrawable(i)->getStateSet()) apply(*(geode.getDrawable(i)->getStateSet()));
 
-                osg::Geometry* geom = geode.getDrawable(i)->asGeometry();
+                osg::NuGeometry* geom = geode.getDrawable(i)->asGeometry();
                 if (geom) apply(*geom);
             }
         }
@@ -165,7 +167,7 @@ class ConvertToVertexAttributeArrays : public osg::NodeVisitor
        }
 
 
-        void apply(osg::Geometry& geom)
+        void apply(osg::NuGeometry& geom)
         {
             geom.setUseDisplayList(false);
             // doesn't help geom.setUseVertexBufferObjects(true);
@@ -191,10 +193,8 @@ class ConvertToVertexAttributeArrays : public osg::NodeVisitor
             if (geom.getColorArray())
             {
                 // blf: Ignore colorArray for now... setVertexAttrib(geom, _colorAlias, geom.getColorArray(), false);
-#ifdef __linux
             	OSG_WARN << "ConvertVertexAttributes: Color Array present Ignored!" << std::endl;
-#endif
-            	geom.setColorArray(0);
+                geom.setColorArray(0);
             }
 
             if (geom.getSecondaryColorArray())
@@ -230,7 +230,7 @@ class ConvertToVertexAttributeArrays : public osg::NodeVisitor
             }
         }
 
-        void setVertexAttrib(osg::Geometry& geom, const AttributeAlias& alias, osg::Array* array, bool normalize, osg::Array::Binding binding = osg::Array::BIND_UNDEFINED)
+        void setVertexAttrib(osg::NuGeometry& geom, const AttributeAlias& alias, osg::Array* array, bool normalize, osg::Array::Binding binding = osg::Array::BIND_UNDEFINED)
         {
             unsigned int index = alias.first;
             const std::string& name = alias.second;

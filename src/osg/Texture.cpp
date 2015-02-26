@@ -66,51 +66,9 @@ Texture::TextureObject::~TextureObject()
     // OSG_NOTICE<<"Texture::TextureObject::~TextureObject() "<<this<<std::endl;
 }
 
-#ifdef WIN32
-#define GL_ACTIVE_TEXTURE 0x84E0
-#define GL_TEXTURE0 0x84C0
-#define GL_TEXTURE1 GL_TEXTURE0+1
-#define GL_TEXTURE2 GL_TEXTURE0+2
-#define GL_TEXTURE3 GL_TEXTURE0+3
-#define GL_TEXTURE4 GL_TEXTURE0+4
-#define GL_TEXTURE5 GL_TEXTURE0+5
-#define GL_TEXTURE6 GL_TEXTURE0+6
-#define GL_TEXTURE7 GL_TEXTURE0+7
-#define GL_TEXTURE8 GL_TEXTURE0+8
-#endif
-
 void Texture::TextureObject::bind()
 {
-	     static GLuint bumper = 3, specular=0, luminosity=0;
-        const unsigned int contextID = 0; // state.getContextID();  // set to 0 right now, assume same parameters for each graphics context...
-        const Extensions* extensions = getExtensions(contextID,true);
-		  const GL2Extensions* EXTensions = GL2Extensions::Get(contextID, true);
     glBindTexture( _profile._target, _id);
-#if 0
-{ // XXX blf: grabbing program usage and setting base texture.
-	 	GLint prog, active;
-		//glGetIntegerv(GL_CURRENT_PROGRAM, &prog);
-		glGetIntegerv(GL_ACTIVE_TEXTURE, &active);
-		if(prog > 0 && (active == GL_TEXTURE0) && (_id > 0)) {
-				//OSG_WARN << _id-1 << " is new base texture " <<  std::endl;
-				EXTensions->glVertexAttrib4f(5, _id-1, specular, bumper, luminosity);
-				//EXTensions->glVertexAttrib4f(5, 2, 2, 3, 0);
-		}	
-		if(prog > 0 && (active == GL_TEXTURE2) && (_id > 0)) {
-				//OSG_WARN << _id-1 << " is new specular2 texture " <<  std::endl;
-				specular = _id-1;
-		}
-		if(prog > 0 && (active == GL_TEXTURE3) && (_id > 0)) {
-				//OSG_WARN << _id-1 << " is new bump3 texture " <<  std::endl;
-				bumper = _id-1;
-		}
-		if(prog > 0 && (active == GL_TEXTURE4) && (_id > 0)) {
-				//OSG_WARN << _id-1 << " is new luminosity4 texture " <<  std::endl;
-				luminosity = _id-1;
-		}
-
-	}
-#endif
     if (_set) _set->moveToBack(this);
 }
 
@@ -1132,8 +1090,7 @@ Texture::Texture():
             _use_shadow_comparison(false),
             _shadow_compare_func(LEQUAL),
             _shadow_texture_mode(LUMINANCE),
-            _shadow_ambient(0),
-				_textureUsageType(COLOR_TEXTURE)
+            _shadow_ambient(0)
 {
 }
 
@@ -1160,8 +1117,7 @@ Texture::Texture(const Texture& text,const CopyOp& copyop):
             _use_shadow_comparison(text._use_shadow_comparison),
             _shadow_compare_func(text._shadow_compare_func),
             _shadow_texture_mode(text._shadow_texture_mode),
-            _shadow_ambient(text._shadow_ambient),
-				_textureUsageType(text._textureUsageType)
+            _shadow_ambient(text._shadow_ambient)
 {
 }
 
@@ -1202,7 +1158,6 @@ int Texture::compareTexture(const Texture& rhs) const
     COMPARE_StateAttribute_Parameter(_resizeNonPowerOfTwoHint)
 
     COMPARE_StateAttribute_Parameter(_internalFormatType);
-    COMPARE_StateAttribute_Parameter(_uniqID); // XXX blf: Added to keep textures for being ignored.
 
     return 0;
 }

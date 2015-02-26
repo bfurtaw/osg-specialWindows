@@ -25,7 +25,7 @@
 #include <map>
 
 namespace osg {
-    class Geometry;
+    class NuGeometry;
 }
 
 
@@ -46,7 +46,7 @@ public:
     VertexPaletteManager( const ExportOptions& fltOpt );
     ~VertexPaletteManager();
 
-    void add( const osg::Geometry& geom );
+    void add( const osg::NuGeometry& geom );
     void add( const osg::Array* key,
         const osg::Vec3dArray* v, const osg::Vec4Array* c,
         const osg::Vec3Array* n, const osg::Vec2Array* t,

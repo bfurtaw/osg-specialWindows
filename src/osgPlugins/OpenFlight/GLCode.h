@@ -3,5 +3,6 @@
 namespace glcode {
 
 void GLCode(GLint context_id);
-
+GLuint getProgramHandle();
+void assignMatrixUniforms(const GLfloat *mv, const GLfloat *project, const GLfloat *normal);
 }

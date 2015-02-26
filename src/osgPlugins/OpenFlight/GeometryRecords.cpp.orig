@@ -454,13 +454,13 @@ protected:
 
         // Lighting
         stateset->setMode(GL_LIGHTING, isLit() ? osg::StateAttribute::ON : osg::StateAttribute::OFF);
-#if 0
         // Prefer Extended Materials  to osg::Material's
         osg::StateSet *extendedMaterial;
         osg::Program* program = new osg::Program; // Must decide if transparent or NOT and load correct shaders
 
         if(materialIndex >= 0 && (extendedMaterial = document.getOrCreateExtendedMaterialPool()->get(materialIndex)) ) {
         	stateset->merge(*extendedMaterial);  // Will not OVERWRITE base texture.
+#if 0
 			if(materialIndex == 1) { // ematrl #1 reflective shiny
              	 program->addShader(osg::Shader::readShaderFile(
              	        osg::Shader::VERTEX,
@@ -481,11 +481,11 @@ protected:
              	        osgDB::findDataFile("frag.glsl") ));
 				  	 //program->addBindFragDataLocation("fragColor", 1);
 			}
+#endif
          stateset->setAttributeAndModes(program, osg::StateAttribute::ON);
         	//OSG_WARN << "Used ExtendedMaterial #" << materialIndex << " ematrl ptr " << extendedMaterial << std::endl;
         // Material
         } else 
-#endif
 		  if (isLit() || materialIndex>=0)
         {
             // MaterialPool will return a "default" material if no material is defined for materialIndex.

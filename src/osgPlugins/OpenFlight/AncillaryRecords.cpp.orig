@@ -12,7 +12,7 @@
 */
 
 //
-// OpenFlight® loader for OpenSceneGraph
+// OpenFlightï¿½ loader for OpenSceneGraph
 //
 //  Copyright (C) 2005-2007  Brede Johansen
 //
@@ -181,6 +181,7 @@ class Multitexture : public Record
         {
             osg::ref_ptr<osg::StateSet> stateset = new osg::StateSet;
 
+
             uint32 mask = in.readUInt32();
             for (int layer=1; layer<8; layer++)
             {
@@ -227,7 +228,7 @@ class Multitexture : public Record
             }
 
             if (_parent.valid())
-                _parent->setMultitexture(*stateset);
+               ;// XXX blf: disable    _parent->setMultitexture(*stateset);
         }
 };
 

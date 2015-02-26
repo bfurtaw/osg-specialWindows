@@ -28,6 +28,7 @@
 #include <osg/Group>
 #include <osg/MatrixTransform>
 #include "Vertex.h"
+#include "NuGeometry.h"
 
 namespace flt
 {
@@ -124,10 +125,10 @@ class DummyRecord : public Record
 
 void insertMatrixTransform(osg::Node& node, const osg::Matrix& matrix, int numberOfReplications);
 
-osg::Vec3Array* getOrCreateVertexArray(osg::Geometry& geometry);
-osg::Vec3Array* getOrCreateNormalArray(osg::Geometry& geometry);
-osg::Vec4Array* getOrCreateColorArray(osg::Geometry& geometry);
-osg::Vec2Array* getOrCreateTextureArray(osg::Geometry& geometry, int unit);
+osg::Vec3Array* getOrCreateVertexArray(osg::NuGeometry& geometry);
+osg::Vec3Array* getOrCreateNormalArray(osg::NuGeometry& geometry);
+osg::Vec4Array* getOrCreateColorArray(osg::NuGeometry& geometry);
+osg::Vec2Array* getOrCreateTextureArray(osg::NuGeometry& geometry, int unit);
 
 
 } // end namespace

@@ -19,6 +19,7 @@ namespace glcode {
 
 typedef void (*funcPtr)(GLint);
 funcPtr g_findActives = NULL;
+GLuint g_uber_model_program = 0;
 
 static void findActivesNewWay( GLint prog) {
 		  GLint numActiveAttribs = 0;
@@ -229,7 +230,6 @@ static GLuint m_numTextures = 0;
 static  NvGLSLProgram*                m_shader = NULL;
         GLint prog;
 		  GLint major, minor;
-		  GLuint dlist[] = {2,3,4,9,10,11,12,13,14,15,16,17,18,19,20,21};
 
 		  glGetIntegerv(GL_CURRENT_PROGRAM, &prog);
 		  OSG_WARN << "Number of Resident Textures: " << m_numTextures << std::endl;
@@ -315,7 +315,7 @@ static  NvGLSLProgram*                m_shader = NULL;
 				if (glewIsExtensionSupported("GL_NV_bindless_texture")) {
 					GLuint samplersLocation(m_shader->getUniformLocation("samplers"));
 					glUniform1ui64vNV(samplersLocation, m_numTextures, m_textureHandles);
-					GLuint uniformLocation(m_shader->getUniformLocation("lightPos"));
+					GLuint uniformLocation(m_shader->getUniformLocation("g_lightPos"));
 					glUniform3f(uniformLocation, 0.0, 1.0, 0.0);
 					OSG_WARN << "Locations (l/s)" << uniformLocation << " " << samplersLocation <<  std::endl;
 					
@@ -323,31 +323,10 @@ static  NvGLSLProgram*                m_shader = NULL;
 				else {
 					GLuint uniformLocation(m_shader->getUniformLocation("lightPos"));
 					glUniform3f(uniformLocation, 0.0, 1.0, 0.0);
-					
-#if 0
-					GLint diffuseLocation(m_shader->getUniformLocation("diffuseMap"));
-					if (diffuseLocation > -1) glUniform1i(diffuseLocation, 1); // base Index TEXUNIT
-					GLint bumpLocation = m_shader->getUniformLocation("bumpMap");
-					if (bumpLocation > -1) glUniform1i(bumpLocation, 3); // 3 Index TEXUNIT
-					GLint specularLocation = m_shader->getUniformLocation("specularMap");
-					if(specularLocation > -1) glUniform1i(specularLocation, 2); // 2 Index TEXUNIT
-
-					
-					OSG_WARN << "Locations " << diffuseLocation << " " << bumpLocation << " " << specularLocation << std::endl;
-#endif
-				}
 				//glDisableVertexAttribArray(5);
 				//glVertexAttrib4f(5, 2,2,3,0);
 		}
-#if 0
-		  GLint diffuseLocation(m_shader->getUniformLocation("diffuseMap"));
-		  if (diffuseLocation > -1) glUniform1i(diffuseLocation, 1); // base Index TEXUNIT
-		  GLint bumpLocation = m_shader->getUniformLocation("bumpMap");
-		  if (bumpLocation > -1) glUniform1i(bumpLocation, 3); // 3 Index TEXUNIT
-		  GLint specularLocation = m_shader->getUniformLocation("specularMap");
-		  if (specularLocation > -1) glUniform1i(specularLocation, 2); // 2 Index TEXUNIT
-		  OSG_WARN << "Shader Prog " << prog << " Locations (d/b/s)" << diffuseLocation << " " << bumpLocation << " " << specularLocation << std::endl;
-#endif
+
 
 #if 0
 					 for(unsigned int list=0; list < sizeof(dlist)/sizeof(GLuint); ++list)
@@ -377,6 +356,20 @@ static  NvGLSLProgram*                m_shader = NULL;
 
 		  //OSG_WARN << std::hex  << glXGetCurrentContext() << std::dec << " is GL_Context ID." << std::endl;
 }
+GLuint getProgramHandle() {
+	return g_uber_model_program;
+}
+
+void assignMatrixUniforms(const GLfloat *mv, const GLfloat *project, const GLfloat *normal) {
+	glUniformMatrix4fv(glGetUniformLocation(g_uber_model_program, "g_ModelViewMatrix"),1,GL_FALSE, (const GLfloat *) mv);
+	glUniformMatrix4fv(glGetUniformLocation(g_uber_model_program, "g_ProjectionMatrix"),1,GL_FALSE, (const GLfloat *) project);
+	glUniformMatrix3fv(glGetUniformLocation(g_uber_model_program, "g_NormalMatrix"),1,GL_FALSE, (const GLfloat *) normal);
+}
+
+// Next do the light direction and color.....
+// void assignLightParams(...) {    }
+
+
 
 
 } // end-namespace glcode
